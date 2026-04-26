@@ -158,7 +158,11 @@ app.get("/", (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-app.post("/factura", (req, res) => {
+// Alias usado por el frontend (contrerakevin05-tech.github.io)
+app.post("/api/calcular", (req, res) => calcularFactura(req, res));
+app.post("/factura",      (req, res) => calcularFactura(req, res));
+
+function calcularFactura(req, res) {
   const { codigo, nombre, costeBase, iva, descuento } = req.body;
 
   if (
@@ -196,7 +200,7 @@ app.post("/factura", (req, res) => {
     iva,
     totalConIva: parseFloat(totalConIva.toFixed(2)),
   });
-});
+}
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
