@@ -165,27 +165,40 @@ app.post("/factura",      (req, res) => calcularFactura(req, res));
 function calcularFactura(req, res) {
   const { codigo, nombre, costeBase, iva, descuento } = req.body;
 
-  if (
-    !codigo || !nombre ||
-    costeBase === undefined || iva === undefined || descuento === undefined
-  ) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios." });
+  // ── Campos obligatorios ──────────────────────────────────────────────
+  if (!codigo || !nombre ||
+      costeBase === undefined || iva === undefined || descuento === undefined) {
+    return res.status(404).json({ error: "Todos los campos son obligatorios." });
   }
 
-  if (
-    typeof costeBase !== "number" ||
-    typeof iva !== "number" ||
-    typeof descuento !== "number"
-  ) {
-    return res.status(400).json({ error: "costeBase, iva y descuento deben ser números." });
+  // ── Tipos numéricos ──────────────────────────────────────────────────
+  if (typeof costeBase !== "number" || typeof iva !== "number" || typeof descuento !== "number") {
+    return res.status(404).json({ error: "costeBase, iva y descuento deben ser números." });
   }
 
+  // ── Formato código: solo alfanumérico ────────────────────────────────
+  if (!/^[a-zA-Z0-9]+$/.test(codigo)) {
+    return res.status(404).json({ error: "El código solo puede contener letras y números." });
+  }
+
+  // ── Formato nombre: solo letras y espacios ───────────────────────────
+  if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(nombre)) {
+    return res.status(404).json({ error: "El nombre solo puede contener letras y espacios." });
+  }
+
+  // ── Costo base: debe ser positivo ────────────────────────────────────
+  if (costeBase <= 0) {
+    return res.status(404).json({ error: "El costo base debe ser un valor positivo mayor a 0." });
+  }
+
+  // ── Descuento: entre 0 y 100 ─────────────────────────────────────────
   if (descuento < 0 || descuento > 100) {
-    return res.status(400).json({ error: "El descuento debe estar entre 0 y 100." });
+    return res.status(404).json({ error: "El descuento debe estar entre 0 y 100." });
   }
 
+  // ── IVA: no puede ser negativo ───────────────────────────────────────
   if (iva < 0) {
-    return res.status(400).json({ error: "El IVA no puede ser negativo." });
+    return res.status(404).json({ error: "El IVA no puede ser negativo." });
   }
 
   const baseConDescuento = costeBase * (1 - descuento / 100);
