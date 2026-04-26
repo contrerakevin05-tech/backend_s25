@@ -189,16 +189,22 @@ function calcularFactura(req, res) {
   }
 
   const baseConDescuento = costeBase * (1 - descuento / 100);
-  const totalConIva = baseConDescuento * (1 + iva / 100);
+  const descuentoValor   = costeBase - baseConDescuento;
+  const ivaValor         = baseConDescuento * (iva / 100);
+  const totalConIva      = baseConDescuento + ivaValor;
 
   res.json({
     codigo,
     nombre,
-    costeBase,
-    descuento,
-    baseConDescuento: parseFloat(baseConDescuento.toFixed(2)),
-    iva,
-    totalConIva: parseFloat(totalConIva.toFixed(2)),
+    desglose: {
+      costeBase:            parseFloat(costeBase.toFixed(2)),
+      descuentoPorcentaje:  descuento,
+      descuentoValor:       parseFloat(descuentoValor.toFixed(2)),
+      subtotalConDescuento: parseFloat(baseConDescuento.toFixed(2)),
+      ivaPorcentaje:        iva,
+      ivaValor:             parseFloat(ivaValor.toFixed(2)),
+      totalAPagar:          parseFloat(totalConIva.toFixed(2)),
+    },
   });
 }
 
